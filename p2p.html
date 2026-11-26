@@ -99,6 +99,29 @@ body.tc #feed{top:96px}body.tc #ammo{font-size:20px}body.tc #bot{bottom:8px;widt
 @media(orientation:portrait){body.tc.ingame #rot,body.tc.plane #rot{display:block;top:40%;left:10%;right:10%;text-align:center;background:var(--hud);padding:12px;border-radius:12px;font-size:16px}}
 body.inmenu .hud,body.inmenu #mm{display:none!important}
 @media(prefers-reduced-motion:reduce){#hp{transition:none}}
+
+#menu{width:min(1100px,100%);padding:20px clamp(14px,3vw,28px);text-align:left}
+.mgrid{display:grid;grid-template-columns:minmax(0,46fr) minmax(0,54fr);gap:clamp(16px,3vw,30px);align-items:start}
+.mright{text-align:center}.mright h1{animation:wob 4s ease-in-out infinite;transform-origin:50% 80%}
+@keyframes wob{0%,100%{transform:rotate(-1.2deg)}50%{transform:rotate(1.2deg) scale(1.02)}}
+.stage{position:relative;border:4px solid var(--o);border-radius:16px;overflow:hidden;background:radial-gradient(ellipse at 50% 108%,#ffe9a8 0 30%,transparent 31%),linear-gradient(#7fc8f3,#cdebfb 62%,#fff3cf);box-shadow:0 6px 0 var(--o)}
+#mpv{display:block;width:100%;aspect-ratio:600/560;cursor:grab;touch-action:none}#mpv:active{cursor:grabbing}
+.arr{position:absolute;top:44%;width:46px;height:46px;border-radius:50%;border:3px solid var(--o);background:#fffdf7;color:var(--o);font:400 30px/1 'Lilita One',sans-serif;cursor:pointer;box-shadow:0 3px 0 var(--o);padding:0 0 4px}
+.arr:hover{background:#ffe08a}.arr:active{transform:translateY(2px);box-shadow:0 1px 0 var(--o)}.arr.l{left:10px}.arr.r{right:10px}
+.plate{position:absolute;left:50%;top:12px;transform:translateX(-50%);background:#fffdf7;border:3px solid var(--o);border-radius:12px;padding:4px 14px 6px;text-align:center;box-shadow:0 3px 0 var(--o);max-width:86%}
+.plate b{display:block;font:400 26px/1.1 'Lilita One',sans-serif;color:var(--red);-webkit-text-stroke:1px var(--o)}.plate span{display:block;font-size:12.5px;line-height:1.3;opacity:.85}
+.shint{position:absolute;left:0;right:0;bottom:8px;text-align:center;font-size:12px;font-weight:600;color:#2d2a32;opacity:.7;pointer-events:none}
+#menu .sw{margin:12px 0 0;gap:6px}#menu .sw button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-height:52px;background:#fff!important;color:var(--o)!important;font-size:11.5px}
+#menu .sw button i{display:block;width:22px;height:16px;border-radius:5px;border:2px solid var(--o)}#menu .sw button.on{background:#ffe08a!important;outline:none;transform:translateY(-2px);box-shadow:0 5px 0 var(--o)}
+#bCust{background:#f2c14e;color:#2d2a32}
+#bNewRoom{min-height:40px;font-size:17px;background:#fff;color:var(--o);box-shadow:0 3px 0 var(--o);margin-top:8px}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin-top:12px}.stats div{border:3px solid var(--o);border-radius:10px;background:#fff;padding:5px 4px;text-align:center;line-height:1.15}.stats b{display:block;font:400 22px 'Lilita One',sans-serif;color:#2bb3a3}.stats small{font-size:11px;font-weight:600;opacity:.75}
+.lab{display:block;text-align:left;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;opacity:.6;margin:10px 0 4px}
+.nickrow{display:flex;gap:8px}.nickrow input{margin:0;flex:1}.nickrow button{flex:none;width:52px;border:3px solid var(--o);border-radius:12px;background:#fff;font-size:24px;cursor:pointer;box-shadow:0 3px 0 var(--o)}.nickrow button:active{transform:translateY(2px);box-shadow:0 1px 0 var(--o)}
+.tip{margin-top:10px;font-size:13.5px;background:#eaf7f4;border:2px dashed #2bb3a3;border-radius:10px;padding:7px 10px;min-height:2.4em;transition:opacity .4s}.tip b{color:#1d8a7e}
+@media(max-width:860px){.mgrid{grid-template-columns:1fr}#mpv{aspect-ratio:600/330}.stage .shint{display:none}.plate{top:8px;padding:2px 12px 4px}.plate b{font-size:21px}.plate span{font-size:11.5px}}
+@media(max-width:520px){.stats{display:none}#mpv{aspect-ratio:600/380}}
+@media(prefers-reduced-motion:reduce){.mright h1{animation:none}}
 </style>
 </head>
 <body>
@@ -120,23 +143,41 @@ body.inmenu .hud,body.inmenu #mm{display:none!important}
 <div id="rot" class="hud">Gira il telefono in orizzontale per giocare meglio</div>
 <div id="over">
   <div class="card" id="menu">
-    <h1>ZONA ROSSA <span>3D</span></h1>
-    <p class="tag">Battle royale in prima persona tra animali a cubo. Resta l'ultimo in piedi.</p>
-    <input id="nick" maxlength="14" placeholder="Il tuo nome" autocomplete="off">
-    <div class="sw" id="sw"></div>
-    <div class="mm" id="sqmode" role="group" aria-label="Squadra"><button type="button" data-s="1">Da solo</button><button type="button" data-s="2">Squadre da 2</button><button type="button" data-s="3">Squadre da 3</button></div>
-    <input id="sqcode" maxlength="12" placeholder="Codice squadra (facoltativo, uguale per gli amici)" autocomplete="off" style="display:none;font-size:14px;padding:9px">
-    <div class="mm" id="mmode" role="group" aria-label="Tipo di partita"><button type="button" data-m="fp">Prima persona</button><button type="button" data-m="tp">Terza persona</button><button type="button" data-m="mix">Misto</button></div>
-    <button class="btn alt" id="bCust" type="button" style="background:#f2c14e;color:#2d2a32">Vestiti e accessori</button>
-    <div id="p2p" style="display:none"><label class="chk"><input type="checkbox" id="pubchk" checked> Mostra la mia partita nella lobby pubblica</label><button class="btn" id="bHost" type="button">Crea partita</button>
+   <div class="mgrid">
+    <section class="mleft" aria-label="Il tuo animale">
+     <div class="stage" id="stage">
+      <canvas id="mpv" width="600" height="560" aria-label="Anteprima del tuo animale" role="img"></canvas>
+      <button class="arr l" id="aPrev" type="button" aria-label="Animale precedente">‹</button>
+      <button class="arr r" id="aNext" type="button" aria-label="Animale successivo">›</button>
+      <div class="plate"><b id="aName">Orso</b><span id="aTag"></span></div>
+      <div class="shint">Trascina per girarlo · clicca per sentire il verso</div>
+     </div>
+     <div class="sw" id="sw" role="group" aria-label="Scegli l'animale"></div>
+     <button class="btn alt" id="bCust" type="button">Vestiti e accessori</button>
+     <div class="stats" id="stats" aria-label="Le tue statistiche"></div>
+    </section>
+    <section class="mright">
+     <h1>ZONA ROSSA <span>3D</span></h1>
+     <p class="tag">Battle royale tra animali a cubo. Lanciati, trova il bottino, resta l'ultimo in piedi.</p>
+     <label class="lab" for="nick">Il tuo nome</label>
+     <div class="nickrow"><input id="nick" maxlength="14" placeholder="Il tuo nome" autocomplete="off"><button type="button" id="bDice" aria-label="Nome a caso" title="Nome a caso">🎲</button></div>
+     <div class="lab">Squadra</div>
+     <div class="mm" id="sqmode" role="group" aria-label="Squadra"><button type="button" data-s="1">Da solo</button><button type="button" data-s="2">Squadre da 2</button><button type="button" data-s="3">Squadre da 3</button></div>
+     <input id="sqcode" maxlength="12" placeholder="Codice squadra (facoltativo, uguale per gli amici)" autocomplete="off" style="display:none;font-size:14px;padding:9px">
+     <div class="lab">Visuale</div>
+     <div class="mm" id="mmode" role="group" aria-label="Tipo di partita"><button type="button" data-m="fp">Prima persona</button><button type="button" data-m="tp">Terza persona</button><button type="button" data-m="mix">Misto</button></div>
+     <div id="p2p" style="display:none"><label class="chk"><input type="checkbox" id="pubchk" checked> Mostra la mia partita nella lobby pubblica</label><button class="btn" id="bHost" type="button">Crea partita</button>
      <div style="display:flex;gap:8px;margin-top:10px"><input id="jcode" inputmode="numeric" maxlength="6" placeholder="Codice partita" autocomplete="off" style="margin:0;flex:1"><button class="btn alt" id="bJoin" type="button" style="margin:0;width:auto;padding:0 18px">Entra</button></div>
      <p class="info" id="lobby" style="margin:8px 0 0"></p><button class="btn" id="bStart" type="button" style="display:none">Avvia partita</button></div>
-    <div id="pub" style="display:none"><div class="pubh"><b>Lobby pubblica</b><span id="pubn"></span></div><div id="publist" role="list"></div><button class="btn alt" id="bNewRoom" type="button" style="display:none">Crea una stanza nuova</button></div>
-    <button class="btn" id="bOn" disabled>Entra nella partita online</button>
-    <button class="btn alt" id="bSolo">Allenamento contro i bot</button>
-    <div class="info" id="info">Connessione alla stanza…</div>
-    <div class="keys"><kbd>WASD</kbd> muoviti · <kbd>mouse</kbd> guarda e spara · <kbd>tasto destro</kbd> mira · <kbd>Spazio</kbd> salta / lanciati · <kbd>C</kbd> accovacciati · <kbd>Z</kbd> sdraiati<br><kbd>E</kbd> raccogli · <kbd>R</kbd> ricarica · <kbd>1</kbd><kbd>2</kbd><kbd>3</kbd> armi · <kbd>Q</kbd> cambia · <kbd>4</kbd> bende · <kbd>5</kbd> kit · <kbd>6</kbd> siringa · <kbd>V</kbd> visuale (Misto) · <kbd>M</kbd> mappa · <kbd>Esc</kbd> libera il mouse</div>
-    <div class="info touch">Stick a sinistra per muoverti, trascina a destra per guardare, tasto rosso per sparare.</div>
+     <div id="pub" style="display:none"><div class="pubh"><b>Lobby pubblica</b><span id="pubn"></span></div><div id="publist" role="list"></div><button class="btn alt" id="bNewRoom" type="button" style="display:none">Crea una stanza nuova</button></div>
+     <button class="btn" id="bOn" disabled>Entra nella partita online</button>
+     <button class="btn alt" id="bSolo">Allenamento contro i bot</button>
+     <div class="info" id="info">Connessione alla stanza…</div>
+     <div class="tip" id="tip" aria-live="polite"></div>
+     <div class="keys"><kbd>WASD</kbd> muoviti · <kbd>mouse</kbd> guarda e spara · <kbd>tasto destro</kbd> mira · <kbd>Spazio</kbd> salta / lanciati · <kbd>C</kbd> accovacciati · <kbd>Z</kbd> sdraiati<br><kbd>E</kbd> raccogli · <kbd>R</kbd> ricarica · <kbd>1</kbd><kbd>2</kbd><kbd>3</kbd> armi · <kbd>Q</kbd> cambia · <kbd>4</kbd> bende · <kbd>5</kbd> kit · <kbd>6</kbd> siringa · <kbd>V</kbd> visuale (Misto) · <kbd>M</kbd> mappa · <kbd>Esc</kbd> libera il mouse</div>
+     <div class="info touch">Stick a sinistra per muoverti, trascina a destra per guardare, tasto rosso per sparare.</div>
+    </section>
+   </div>
   </div>
   <div class="card" id="cust" style="display:none">
     <p class="big" style="margin:0">Il tuo personaggio</p>
@@ -1115,7 +1156,7 @@ function drawMini(z,nz,ts){const W2=mm.width,k=W2/WORLD;mx.clearRect(0,0,W2,W2);
 /* ---------- CICLO ---------- */
 let last=performance.now(),uiT=0,lastKills=0,zShr=false,hbT=0;
 world=genMap(777);buildWorld(world);
-function frame(now){document.body.classList.toggle('inmenu',mode==='menu');const dt=Math.min(.05,(now-last)/1000);last=now;
+function frame(now){document.body.classList.toggle('inmenu',mode==='menu');const dt=Math.min(.05,(now-last)/1000);last=now;mpFrame(dt);
  if(mode!=='menu'&&paused&&mode==='solo'){render3d(clock(),0)}
  else if(mode!=='menu'){const c=clock();
   if(c.idx!==curIdx)newRound(c);
@@ -1160,7 +1201,7 @@ function ui(c){const ts=(c.t-LOBBY)/1000,z=zoneAt(ts);
  if(feed.length&&performance.now()-feed[feed.length-1].at>9000){feed.pop();drawFeed()}
  document.body.classList.toggle('ingame',fp);document.body.classList.toggle('plane',me.alive&&me.playing&&me.st===1);if(isTouch){$('tbE').classList.toggle('near',!!nearItem&&!nearFull);$('tbV').style.display=matchMode==='mix'?'':'none';$('tbA').classList.toggle('on',tAds);$('tbC').classList.toggle('on',me.pose===1);$('tbZ').classList.toggle('on',me.pose===2)}
 }
-function showEnd(t,s){setTimeout(()=>{if(NET==='p2p'){$('bAgain').style.display=p2p.host?'block':'none';$('bAgain').textContent=p2p.host?'Nuova partita per tutti':'Nuova partita';if(!p2p.host)$('endI').textContent='Aspetta che l\u2019host avvii la prossima partita.'}},0);me.ended=true;paused=false;$('pause').style.display='none';try{document.exitPointerLock&&document.exitPointerLock()}catch(e){}
+function showEnd(t,s){if(!me.ended)recordMatch(t==='Vittoria!');setTimeout(()=>{if(NET==='p2p'){$('bAgain').style.display=p2p.host?'block':'none';$('bAgain').textContent=p2p.host?'Nuova partita per tutti':'Nuova partita';if(!p2p.host)$('endI').textContent='Aspetta che l\u2019host avvii la prossima partita.'}},0);me.ended=true;paused=false;$('pause').style.display='none';try{document.exitPointerLock&&document.exitPointerLock()}catch(e){}
  $('over').style.display='grid';$('menu').style.display='none';$('end').style.display='block';$('endT').textContent=t;$('endS').textContent=s;
  $('endT').style.color=t==='Vittoria!'?'#e0a400':'#e8392b';$('bAgain').style.display=mode==='solo'?'block':'none';$('endI').textContent=mode==='solo'?'':'Puoi continuare a guardare la partita.';
  $('over').style.background='rgba(30,60,90,.15)';$('over').style.pointerEvents='none';$('end').style.pointerEvents='auto'}
@@ -1168,9 +1209,54 @@ function hideOver(){$('over').style.display='none';$('over').style.pointerEvents
 function showMenu(){paused=false;$('pause').style.display='none';mode='menu';curIdx=null;me.alive=false;me.playing=false;$('over').style.display='grid';$('over').style.pointerEvents='auto';$('over').style.background='';$('menu').style.display='block';$('end').style.display='none';
  for(const en of ents.values())scene.remove(en.g);ents.clear();
  if(room)room.presence({r:null,al:0,pl:0,s:null,b:null,h:null}).catch(()=>{});updMenu()}
-const swEl=$('sw');COLORS.forEach(col=>{const b=document.createElement('button');b.style.background=CHARS[col].c;b.style.color=col==='pinguino'||col==='gufo'?'#fff':'#2d2a32';b.textContent=CHARS[col].n;if(col===myColor)b.className='on';
- b.onclick=()=>{myColor=col;[...swEl.children].forEach(x=>x.className='');b.className='on';try{localStorage.setItem('zr3_char',col)}catch(e){}};swEl.appendChild(b)});
+const swEl=$('sw');COLORS.forEach(col=>{const b=document.createElement('button');b.type='button';const i=document.createElement('i');i.style.background=CHARS[col].c;b.append(i,CHARS[col].n);b.setAttribute('aria-pressed',col===myColor);if(col===myColor)b.className='on';
+ b.onclick=()=>pickAnimal(col);swEl.appendChild(b)});
 $('nick').value=myName;
+/* ---------- MENU: palco 3D con l'animale, statistiche, consigli ---------- */
+const TAGS={orso:'Grosso, peloso e sempre affamato di bottino.',procione:'Ladro di professione: le casse sono sue.',maiale:'Rotola nel fango e non molla mai.',volpe:'Furba e silenziosa, colpisce di sorpresa.',tigre:'Strisce da caccia, grinta da campione.',
+ rana:'Salta fuori dai cespugli quando meno te lo aspetti.',gufo:'Vede tutto, anche al buio dietro i muri.',elefante:'Memoria lunga: non dimentica chi lo ha colpito.',pinguino:'Elegante in smoking anche in mezzo alla zona rossa.',coniglio:'Orecchie lunghe, sente i passi da lontano.'};
+const mpR=new THREE.WebGLRenderer({canvas:$('mpv'),antialias:true,alpha:true});mpR.setPixelRatio(Math.min(2,devicePixelRatio||1));
+const mpS=new THREE.Scene(),mpC=new THREE.PerspectiveCamera(30,600/560,.1,80);mpC.position.set(0,4,12.6);mpC.lookAt(0,1.6,0);
+mpS.add(new THREE.HemisphereLight('#ffffff','#8fbf5a',.85));{const d=new THREE.DirectionalLight('#fff4dc',.75);d.position.set(4,8,6);mpS.add(d);const r=new THREE.DirectionalLight('#9fd3ff',.35);r.position.set(-5,3,-4);mpS.add(r)}
+const mpBase=new THREE.Group();mpS.add(mpBase);
+{const fm=c=>new THREE.MeshLambertMaterial({color:c,flatShading:true});
+ const top=new THREE.Mesh(new THREE.CylinderGeometry(2.35,2.45,.34,9),fm('#7cc242'));top.position.y=-.17;mpBase.add(top);
+ const dirt=new THREE.Mesh(new THREE.CylinderGeometry(2.45,1.9,.9,9),fm('#9a6a3f'));dirt.position.y=-.79;mpBase.add(dirt);
+ const rk=new THREE.DodecahedronGeometry(.32,0);[[1.7,.9,'#a3a8b0'],[-1.5,1.2,'#8d9099'],[.6,-1.8,'#b7bcc4']].forEach(([x,z,c],k)=>{const m=new THREE.Mesh(rk,fm(c));m.position.set(x,.02,z);m.scale.set(1,.7+k*.15,1);m.rotation.y=k;mpBase.add(m)});
+ const bl=new THREE.ConeGeometry(.09,.5,4);for(let k=0;k<26;k++){const a=k*2.4,r=1.1+(k*.37%1)*1.1;const m=new THREE.Mesh(bl,fm(k%3?'#5fa83a':'#8fd35a'));m.position.set(Math.cos(a)*r,.2,Math.sin(a)*r);m.rotation.z=(k%5-2)*.12;mpBase.add(m)}
+ const st=new THREE.CylinderGeometry(.025,.025,.36,4),pe=new THREE.OctahedronGeometry(.1,0);[['#ff6b8b',-1.9,-.4],['#ffd23f',1.2,1.5],['#ffffff',-.9,1.8],['#7fb8ff',1.95,-.9]].forEach(([c,x,z])=>{const s1=new THREE.Mesh(st,fm('#4f8f2e'));s1.position.set(x,.18,z);mpBase.add(s1);const p=new THREE.Mesh(pe,fm(c));p.position.set(x,.4,z);mpBase.add(p)})}
+const mpSh=new THREE.Mesh(new THREE.CircleGeometry(.9,16),new THREE.MeshBasicMaterial({color:'#000',transparent:true,opacity:.18}));mpSh.rotation.x=-Math.PI/2;mpSh.position.y=.012;mpS.add(mpSh);
+let mpG=null,mpKey='',mpPop=1,mpRot=-.5,mpVel=0,mpDrag=null,mpT=0;
+const mpGuns=['ar','pistola','pompa','smg','cecchino'];
+function mpBuild(){const key=myColor+'|'+myOut.join(',');if(key===mpKey&&mpG)return;mpKey=key;if(mpG)mpS.remove(mpG);mpG=charMesh(myColor,myOut,0,0);mpG.userData.vest.visible=false;
+ try{setGun(mpG,mpGuns[COLORS.indexOf(myColor)%mpGuns.length])}catch(e){setGun(mpG,'ar')}mpS.add(mpG);
+ $('aName').textContent=CHARS[myColor].n;$('aTag').textContent=TAGS[myColor]||'';[...swEl.children].forEach((x,i)=>{const on=COLORS[i]===myColor;x.className=on?'on':'';x.setAttribute('aria-pressed',on)})}
+function pickAnimal(col,noVoice){if(col===myColor&&mpG)return;myColor=col;try{localStorage.setItem('zr3_char',col)}catch(e){}mpBuild();mpPop=0;if(!noVoice){initAudio();voice(col,1)}}
+const stepAnimal=d=>pickAnimal(COLORS[(COLORS.indexOf(myColor)+d+COLORS.length)%COLORS.length]);
+$('aPrev').onclick=()=>stepAnimal(-1);$('aNext').onclick=()=>stepAnimal(1);
+{const c=$('mpv');let moved=0;c.addEventListener('pointerdown',e=>{mpDrag={x:e.clientX,t:performance.now()};moved=0;try{c.setPointerCapture(e.pointerId)}catch(_){}});
+ c.addEventListener('pointermove',e=>{if(!mpDrag)return;const dx=e.clientX-mpDrag.x;mpDrag.x=e.clientX;moved+=Math.abs(dx);mpRot+=dx*.012;mpVel=dx*.012});
+ c.addEventListener('pointerup',()=>{if(mpDrag&&moved<6){initAudio();voice(myColor,1);mpPop=.55}mpDrag=null});c.addEventListener('pointercancel',()=>mpDrag=null)}
+addEventListener('keydown',e=>{if(mode!=='menu'||$('menu').style.display==='none'||/INPUT|TEXTAREA/.test(document.activeElement&&document.activeElement.tagName))return;if(e.key==='ArrowLeft')stepAnimal(-1);if(e.key==='ArrowRight')stepAnimal(1)});
+function mpSize(){const c=$('mpv'),w=c.clientWidth,h=c.clientHeight;if(!w||!h)return;if(c.width!==Math.round(w*mpR.getPixelRatio())||c.height!==Math.round(h*mpR.getPixelRatio())){mpR.setSize(w,h,false);mpC.aspect=w/h;mpC.updateProjectionMatrix()}}
+function mpFrame(dt){if(mode!=='menu'||$('menu').style.display==='none'||$('over').style.display==='none')return;mpSize();mpBuild();mpT+=dt;
+ if(!mpDrag){mpVel*=.92;mpRot+=mpVel+(Math.abs(mpVel)<.004?dt*.45:0)}
+ mpPop=Math.min(1,mpPop+dt*2.6);const p=mpPop,ease=1+2.2*Math.pow(p-1,3)+1.2*Math.pow(p-1,2);const sc=.25+.75*ease;
+ const hop=Math.abs(Math.sin(mpT*2.2))*.06+(1-p)*.8*Math.sin(p*Math.PI);
+ mpG.position.y=hop;mpG.rotation.y=mpRot;mpG.scale.set(sc,sc*(1+Math.sin(mpT*4.4)*.012),sc);mpBase.rotation.y=mpRot*.25;mpSh.scale.setScalar(1-hop*.4);
+ mpR.render(mpS,mpC)}
+/* statistiche salvate nel browser */
+let ST={g:0,w:0,k:0,b:0};try{const o=JSON.parse(localStorage.getItem('zr3_stats')||'null');if(o&&typeof o==='object')ST={g:+o.g||0,w:+o.w||0,k:+o.k||0,b:+o.b||0}}catch(e){}
+function drawStats(){const box=$('stats');box.textContent='';[['Partite',ST.g],['Vittorie',ST.w],['Uccisioni',ST.k],['Record',ST.b]].forEach(([l,v])=>{const d=document.createElement('div'),b=document.createElement('b'),sm=document.createElement('small');b.textContent=v;sm.textContent=l;d.append(b,sm);box.appendChild(d)})}
+function recordMatch(won){ST.g++;if(won)ST.w++;ST.k+=me.kills;ST.b=Math.max(ST.b,me.kills);try{localStorage.setItem('zr3_stats',JSON.stringify(ST))}catch(e){}drawStats()}
+drawStats();
+/* nome a caso */
+const NA=['Orso','Volpe','Tigre','Rana','Gufo','Maiale','Coniglio','Procione','Pinguino','Elefante','Riccio','Talpa'],NB=['Furioso','Ninja','Turbo','Matto','Spietato','Fifone','Dorato','Volante','Ribelle','Fulmine','Pazzo','Gentile'];
+$('bDice').onclick=()=>{let n;do{n=NA[Math.random()*NA.length|0]+' '+NB[Math.random()*NB.length|0]}while(n.length>14);$('nick').value=n;readNick();const b=$('bDice');b.animate&&b.animate([{transform:'rotate(0)'},{transform:'rotate(360deg)'}],{duration:400})};
+/* consigli che cambiano */
+const TIPS=['Tieni premuto il <b>tasto destro</b> per mirare con precisione.','Colpisci alla <b>testa</b>: fa molti più danni.','Lo <b>zaino</b> più grande ti fa portare più munizioni e cure.','Dall’aereo premi <b>Spazio</b> per lanciarti dove vuoi.',
+ 'Stai dentro la zona sicura: fuori perdi vita ogni secondo.','Le <b>siringhe</b> ti curano piano piano mentre corri.','Dal secondo piano delle case si spara bene dalle finestre.','Sdraiati con <b>Z</b> nell’erba alta per non farti vedere.','Premi <b>M</b> per aprire la mappa grande.','Chi viene eliminato lascia a terra tutto il suo bottino.'];
+let tipI=Math.random()*TIPS.length|0;function nextTip(){const t=$('tip');t.style.opacity=0;setTimeout(()=>{t.innerHTML='<b>Consiglio:</b> '+TIPS[tipI++%TIPS.length];t.style.opacity=1},350)}nextTip();setInterval(()=>{if(mode==='menu')nextTip()},7000);
 function readNick(){myName=($('nick').value.trim()||'Recluta').slice(0,14);try{localStorage.setItem('zr3_nick',myName)}catch(e){}}
 $('bSolo').onclick=()=>{initAudio();readNick();mode='solo';soloSeed=(Math.random()*1e9)>>>0;soloStart=performance.now()-(LOBBY-5000);curIdx=null;if(room)room.presence({r:null,al:0,pl:0,s:null,b:null,h:null}).catch(()=>{});hideOver()};
 $('bOn').onclick=()=>{if(!room)return;initAudio();readNick();mode='online';curIdx=null;hideOver();const c=clock();if(c.t>=LOBBY-1500){newRound(c);curIdx=c.idx}};
@@ -1192,7 +1278,7 @@ const ROWS=[['Animale',()=>COLORS.length,i=>CHARS[COLORS[i]].n,()=>COLORS.indexO
 function drawRows(){const box=$('rows');box.textContent='';ROWS.forEach(([lab,n,name,get,set])=>{const r=document.createElement('div');r.className='row';const l=document.createElement('div');l.textContent=lab;
  const p=document.createElement('button');p.type='button';p.textContent='‹';p.setAttribute('aria-label',lab+' precedente');const v=document.createElement('span');v.textContent=name(get());const nx=document.createElement('button');nx.type='button';nx.textContent='›';nx.setAttribute('aria-label',lab+' successivo');
  const go=d=>{set((get()+d+n())%n());saveLook();drawRows();pvBuild()};p.onclick=()=>go(-1);nx.onclick=()=>go(1);r.append(l,p,v,nx);box.appendChild(r)})}
-function saveLook(){try{localStorage.setItem('zr3_char',myColor);localStorage.setItem('zr3_out',JSON.stringify(myOut))}catch(e){}[...swEl.children].forEach((x,i)=>x.className=COLORS[i]===myColor?'on':'')}
+function saveLook(){try{localStorage.setItem('zr3_char',myColor);localStorage.setItem('zr3_out',JSON.stringify(myOut))}catch(e){}mpKey=''}
 $('bCust').onclick=()=>{$('menu').style.display='none';$('cust').style.display='block';drawRows();pvBuild();pvOn=true;pvLoop()};
 $('bDone').onclick=()=>{pvOn=false;$('cust').style.display='none';$('menu').style.display='block'};
 function drawSQ(){[...$('sqmode').children].forEach(b=>b.className=+b.dataset.s===squad?'on':'');$('sqcode').style.display=squad>1?'block':'none'}
