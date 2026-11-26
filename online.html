@@ -137,12 +137,13 @@ body.tc.ingame #prompt:not(.full){display:none!important}
 .setg label.chk{display:flex;justify-content:flex-start;margin:0}
 #tbV{display:none!important}
 .mright h1{font-size:clamp(34px,5.4vw,54px)}.mright h1 .paw{font-style:normal;-webkit-text-stroke:0;text-shadow:none;font-size:.7em;display:inline-block;transform:rotate(-12deg)}
+#dmgdir{position:fixed;left:50%;top:50%;width:320px;height:320px;margin:-160px 0 0 -160px;pointer-events:none;z-index:8;will-change:transform;transform:translateZ(0)}
 </style>
 </head>
 <body>
 <canvas id="cv"></canvas>
 <div id="gas" class="hud"></div><div id="under" class="hud"></div><div id="splat" class="hud"></div><div id="toast" class="hud"></div><div id="dmg" class="hud"></div>
-<div id="scope" class="hud"></div><div id="cross" class="hud"></div><div id="headm" class="hud">COLPO IN TESTA!</div><div id="dot" class="hud"></div><div id="hitm" class="hud"></div>
+<div id="scope" class="hud"></div><div id="cross" class="hud"></div><div id="headm" class="hud">COLPO IN TESTA!</div><div id="dot" class="hud"></div><div id="hitm" class="hud"></div><canvas id="dmgdir" class="hud" aria-hidden="true"></canvas>
 <div id="pp" class="hud"><canvas id="ppc" width="240" height="260"></canvas><div id="ppb"></div></div>
 <div id="tl" class="hud"><div class="pill">Vivi<b id="alive">0</b></div><div class="pill">Uccisioni<b id="kills">0</b></div><div class="pill" id="net">Solo</div><button class="pill" id="bEsc" type="button">Esc · Menu</button></div>
 <div id="feed" class="hud"></div>
@@ -468,7 +469,7 @@ function stepBullets(dt,c){const fight=c.t>=LOBBY;
    if(o){hit=true;if(!b.inv){spawnPart(b.x,b.y,'#ffe680',b.h-.7);spawnPart(b.x,b.y,'#fff4c0',b.h-.7)}puff(b.x,b.y,o.t==='crate'?'#f0a952':o.t==='tree'?'#7a5030':o.t==='wall'?'#f0dfc0':'#b9b6cc',b.lv);
     if(o.t==='crate'&&auth(b.o)&&fight){o.hp-=b.dmg;if(o.hp<=0){breakCrate(o);myCr.push(o.id)}}break}
    let vh;
-   if(me.alive&&me.playing&&b.o!==myId()&&!friend(b.tm,myTeam())&&canHit(b,me,high)&&Math.hypot(b.x-me.x,b.y-me.y)<hitR(me)&&(vh=vHit(b,me))){hit=true;me.hitT=performance.now();if(fight){me.hp-=hurt(me,b.dmg,vh===2);me.flash=vh===2?.8:.5;me.heal=null;SFX.hurt();hitVoice('me',myColor,me);if(vh===2)headT=1;if(me.hp<=0)die(b.o)}break}
+   if(me.alive&&me.playing&&b.o!==myId()&&!friend(b.tm,myTeam())&&canHit(b,me,high)&&Math.hypot(b.x-me.x,b.y-me.y)<hitR(me)&&(vh=vHit(b,me))){hit=true;me.hitT=performance.now();if(fight){{const sp=Math.hypot(b.vx,b.vy)||1;dmgFrom(b.x-b.vx/sp*b.d,b.y-b.vy/sp*b.d)}me.hp-=hurt(me,b.dmg,vh===2);me.flash=vh===2?.8:.5;me.heal=null;SFX.hurt();hitVoice('me',myColor,me);if(vh===2)headT=1;if(me.hp<=0)die(b.o)}break}
    for(const r of remote.values()){if(r.al&&r.pl&&r.id!==b.o&&!friend(b.tm,r.tm)&&canHit(b,r,high)&&Math.hypot(b.x-r.x,b.y-r.y)<hitR(r)&&(vh=vHit(b,r))){hit=true;r.hitT=performance.now();blood(b.x,b.y,r);hitVoice(r.id,r.c,r);if(b.o===myId()){hitMark(vh===2);dmgNum(r.x,r.y,elev(r),Math.round(hurt(r,b.dmg,vh===2)),vh===2)}break}}if(hit)break;
    const bl=isHost?bots:[...rbots.values()];
    for(const bt of bl){if(bt.al&&bt.id!==b.o&&!friend(b.tm,bt.tm)&&canHit(b,bt,high)&&Math.hypot(b.x-bt.x,b.y-bt.y)<PR&&(vh=vHit(b,bt))){hit=true;bt.hitT=performance.now();blood(b.x,b.y,bt);hitVoice(bt.id,botChar(bt.id),bt);if(b.o===myId()){hitMark(vh===2);dmgNum(bt.x,bt.y,elev(bt),Math.round(hurt(bt,b.dmg,vh===2)),vh===2)}
@@ -750,6 +751,19 @@ let kick=0,bobT=0;
 function pushApart(e){if(e.st)return;const R2=PR*1.7,others=[];if(e!==me&&me.alive&&me.playing&&!me.st)others.push(me);for(const r of remote.values())if(r.al&&r.pl&&!r.st)others.push(r);for(const b of (isHost?bots:[...rbots.values()]))if(b.al&&!b.st&&b!==e)others.push(b);
  for(const o of others){if((o.lv||0)!==(e.lv||0))continue;const dx=e.x-o.x,dy=e.y-o.y,d=Math.hypot(dx,dy);if(d>=R2)continue;const n=d>.01?d:1,ux=d>.01?dx/n:Math.cos(e.a),uy=d>.01?dy/n:Math.sin(e.a);const pen=R2-d;e.x+=ux*pen*.6;e.y+=uy*pen*.6;collide(e,PR)}}
 /* coccodrilli: nuotano nel loro laghetto e attaccano chi si avvicina all'acqua */
+/* indicatore da dove arrivano i colpi: semicerchio con triangolo intorno al mirino */
+const dmgDirs=[];function dmgFrom(x,y){if(!isFinite(x)||!isFinite(y))return;const n=performance.now();for(const d of dmgDirs)if(Math.hypot(d.x-x,d.y-y)<160){d.x=x;d.y=y;d.t=n;return}dmgDirs.push({x,y,t:n});if(dmgDirs.length>6)dmgDirs.shift()}
+function drawDmgDir(){const cv=$('dmgdir');if(!cv)return;const dpr=Math.min(2,devicePixelRatio||1),W=320*dpr;if(cv.width!==W){cv.width=cv.height=W}const g=cv.getContext('2d');g.setTransform(dpr,0,0,dpr,0,0);g.clearRect(0,0,320,320);
+ if(!dmgDirs.length||!me.alive||mode==='menu'){dmgDirs.length=0;return}const now=performance.now();
+ for(let i=dmgDirs.length-1;i>=0;i--){const d=dmgDirs[i],age=(now-d.t)/1900;if(age>=1){dmgDirs.splice(i,1);continue}
+  const al=age<.12?1:1-Math.pow((age-.12)/.88,2),ang=Math.atan2(d.y-me.y,d.x-me.x),rel=ang-me.a,phi=rel-Math.PI/2,c=160,R1=108,sw=.5;
+  g.save();g.globalAlpha=al;g.lineCap='round';
+  g.strokeStyle='rgba(0,0,0,.22)';g.lineWidth=12;g.beginPath();g.arc(c,c,R1,phi-sw*.7,phi+sw*.7);g.stroke();
+  const gr=g.createLinearGradient(c+Math.cos(phi-sw)*R1,c+Math.sin(phi-sw)*R1,c+Math.cos(phi+sw)*R1,c+Math.sin(phi+sw)*R1);gr.addColorStop(0,'rgba(255,60,40,0)');gr.addColorStop(.5,'rgba(255,60,40,1)');gr.addColorStop(1,'rgba(255,60,40,0)');
+  g.strokeStyle=gr;g.lineWidth=8;g.beginPath();g.arc(c,c,R1,phi-sw,phi+sw);g.stroke();
+  const ux=Math.cos(phi),uy=Math.sin(phi),px=-uy,py=ux,tip=R1+30,base=R1+12;
+  g.fillStyle='#ff3c28';g.strokeStyle='rgba(0,0,0,.45)';g.lineWidth=2;g.lineJoin='round';g.beginPath();g.moveTo(c+ux*tip,c+uy*tip);g.lineTo(c+ux*base+px*12,c+uy*base+py*12);g.lineTo(c+ux*base-px*12,c+uy*base-py*12);g.closePath();g.stroke();g.fill();
+  g.restore()}}
 function stepCrocs(dt,fight){if(!world||!world.crocs)return;const tg=[];if(me.alive&&me.playing&&!me.st)tg.push(me);for(const r of remote.values())if(r.al&&r.pl&&!r.st)tg.push(r);for(const b of (isHost?bots:[...rbots.values()]))if(b.al&&!b.st)tg.push(b);
  for(const c of world.crocs){c.cd=Math.max(0,c.cd-dt);c.bite=Math.max(0,c.bite-dt*2.5);let best=null,bd=1e9;
   for(const t of tg){if(t.lv)continue;const d=Math.hypot(t.x-c.x,t.y-c.y);if(d<bd&&d<330&&ground(t.x,t.y)<.25){bd=d;best=t}}
@@ -757,7 +771,7 @@ function stepCrocs(dt,fight){if(!world||!world.crocs)return;const tg=[];if(me.al
   const dx=c.tx-c.x,dy=c.ty-c.y,d=Math.hypot(dx,dy);c.sw=0;if(d>6){const want=Math.atan2(dy,dx);let da=want-c.a;da=Math.atan2(Math.sin(da),Math.cos(da));c.a+=clamp(da,-dt*3.2,dt*3.2);
    const step=Math.min(Math.max(0,d-(best?38:0)),sp*dt)*(Math.abs(da)<1.2?1:.3);if(step>0){const nx=c.x+Math.cos(c.a)*step,ny=c.y+Math.sin(c.a)*step,gn=ground(nx,ny);if(gn<-.3||(best&&gn<.12)){c.x=nx;c.y=ny;c.sw=step/dt}}}
   if(best&&bd<72&&c.cd<=0){c.cd=1.15;c.bite=1;SFX.crate();
-   if(best===me){me.hp-=hurt(me,24,false);me.hitT=performance.now();me.flash=.6;me.heal=null;SFX.hurt();hitVoice('me',myColor,me);shakeT=.5;if(me.hp<=0)die('croc')}
+   if(best===me){dmgFrom(c.x,c.y);me.hp-=hurt(me,24,false);me.hitT=performance.now();me.flash=.6;me.heal=null;SFX.hurt();hitVoice('me',myColor,me);shakeT=.5;if(me.hp<=0)die('croc')}
    else{if(best.c||best.id)blood(best.x,best.y,best);if(isHost&&bots.includes(best)){best.hp-=hurt(best,24,false);if(best.hp<=0)killBot(best,'croc')}}}}}
 function stepMe(dt,c){const fight=c.t>=LOBBY,ts=(c.t-LOBBY)/1000;
  if(keys.arrowleft)me.a-=2.4*dt;if(keys.arrowright)me.a+=2.4*dt;
@@ -1327,7 +1341,7 @@ function drawMini(z,nz,ts){const W2=mm.width,k=W2/WORLD;mx.clearRect(0,0,W2,W2);
 /* ---------- CICLO ---------- */
 let last=performance.now(),uiT=0,lastKills=0,zShr=false,hbT=0;
 world=genMap(777);buildWorld(world);
-function frame(now){document.body.classList.toggle('inmenu',mode==='menu');const dt=Math.min(.05,(now-last)/1000);last=now;mpFrame(dt);
+function frame(now){document.body.classList.toggle('inmenu',mode==='menu');const dt=Math.min(.05,(now-last)/1000);last=now;mpFrame(dt);drawDmgDir();
  if(mode!=='menu'&&paused&&mode==='solo'){render3d(clock(),0)}
  else if(mode!=='menu'){const c=clock();
   if(c.idx!==curIdx)newRound(c);
