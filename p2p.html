@@ -69,6 +69,13 @@ input:focus-visible,button:focus-visible{outline:3px solid #ffb800;outline-offse
 .keys{font-size:13px;opacity:.75;margin-top:10px;line-height:1.7}
 kbd{background:#ece6d8;border-radius:4px;padding:1px 6px;font:600 12px Rubik,sans-serif}
 .row{display:grid;grid-template-columns:7.5em 44px minmax(0,1fr) 44px;gap:6px;align-items:center;margin:6px 0;text-align:left;font-weight:600;font-size:14px}.row button{min-height:40px;border-radius:10px;border:3px solid var(--o);background:#fff;font:800 18px Rubik,sans-serif;cursor:pointer;color:var(--o)}.row span{text-align:center;background:#f3efe4;border-radius:10px;padding:8px 4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#pub{margin:10px 0 4px;text-align:left}.pubh{display:flex;justify-content:space-between;align-items:baseline;font-size:14px;margin-bottom:4px}.pubh span{font-size:12px;opacity:.7}
+#publist{max-height:176px;overflow:auto;border:3px solid var(--o);border-radius:10px;background:#fff}
+.pr{display:flex;align-items:center;gap:8px;padding:6px 8px;border-bottom:1px solid #0002;font-size:13px;line-height:1.3}.pr:last-child{border-bottom:0}.pr .pt{flex:1;min-width:0}.pr b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.pr small{opacity:.75}
+.pr button{min-height:38px;padding:0 14px;border-radius:9px;border:3px solid var(--o);background:#e8392b;color:#fff;font:700 13px Rubik,sans-serif;cursor:pointer;flex:none}.pr button:disabled{background:#bbb;cursor:default}.pr.me{background:#fff6d8}
+.tg{display:inline-block;font-size:10px;font-weight:800;padding:1px 6px;border-radius:6px;background:#2bb3a3;color:#fff;margin-right:5px;vertical-align:1px}.tg.p{background:#f2c14e;color:#2d2a32}
+.pempty{padding:12px;font-size:13px;opacity:.7;text-align:center}
+.chk{display:flex;gap:8px;align-items:center;justify-content:center;font-size:14px;margin:12px 0 8px;cursor:pointer}.chk input{width:20px;height:20px;margin:0;min-height:0;flex:none}
 .mm{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin:2px 0 4px}.mm button{min-height:44px;border-radius:10px;border:3px solid var(--o);background:#fff;color:var(--o);font:700 13px Rubik,sans-serif;cursor:pointer}.mm button.on{background:#2d2a32;color:#fff}
 .big{font-family:'Lilita One',sans-serif;font-size:clamp(30px,6vw,44px);margin:0 0 6px}
 .touch{display:none}body.tc .touch{display:block}body.tc .keys{display:none}
@@ -121,9 +128,10 @@ body.inmenu .hud,body.inmenu #mm{display:none!important}
     <input id="sqcode" maxlength="12" placeholder="Codice squadra (facoltativo, uguale per gli amici)" autocomplete="off" style="display:none;font-size:14px;padding:9px">
     <div class="mm" id="mmode" role="group" aria-label="Tipo di partita"><button type="button" data-m="fp">Prima persona</button><button type="button" data-m="tp">Terza persona</button><button type="button" data-m="mix">Misto</button></div>
     <button class="btn alt" id="bCust" type="button" style="background:#f2c14e;color:#2d2a32">Vestiti e accessori</button>
-    <div id="p2p" style="display:none"><button class="btn" id="bHost" type="button">Crea partita</button>
+    <div id="p2p" style="display:none"><label class="chk"><input type="checkbox" id="pubchk" checked> Mostra la mia partita nella lobby pubblica</label><button class="btn" id="bHost" type="button">Crea partita</button>
      <div style="display:flex;gap:8px;margin-top:10px"><input id="jcode" inputmode="numeric" maxlength="6" placeholder="Codice partita" autocomplete="off" style="margin:0;flex:1"><button class="btn alt" id="bJoin" type="button" style="margin:0;width:auto;padding:0 18px">Entra</button></div>
      <p class="info" id="lobby" style="margin:8px 0 0"></p><button class="btn" id="bStart" type="button" style="display:none">Avvia partita</button></div>
+    <div id="pub" style="display:none"><div class="pubh"><b>Lobby pubblica</b><span id="pubn"></span></div><div id="publist" role="list"></div><button class="btn alt" id="bNewRoom" type="button" style="display:none">Crea una stanza nuova</button></div>
     <button class="btn" id="bOn" disabled>Entra nella partita online</button>
     <button class="btn alt" id="bSolo">Allenamento contro i bot</button>
     <div class="info" id="info">Connessione alla stanza…</div>
@@ -145,7 +153,7 @@ body.inmenu .hud,body.inmenu #mm{display:none!important}
     <button class="btn" id="bAgain">Nuova partita</button><button class="btn alt" id="bMenu">Torna al menu</button>
   </div>
 </div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script><script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script><script>window.ZR_NET="p2p"</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script><script>window.ZR_NET="p2p";window.ZR_SB_URL="https://skqmwnoewpqflpfaiuzj.supabase.co";window.ZR_SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNrcW13bm9ld3BxZmxwZmFpdXpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQ3NTAyNTcsImV4cCI6MjExMDMyNjI1N30.FKi7h0XuHYH4ZnY4cvgGbbUFYtdUexmyecMtcaGHHuM"</script><script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
 <script>
 {
 const $=id=>document.getElementById(id);
@@ -1228,8 +1236,11 @@ async function p2pTransport(code,host){
  if(host)peer.on('connection',c=>wire(c));
  else{const c=peer.connect('zr3-'+code,{serialization:'json',reliable:false});wire(c);await new Promise((res,rej)=>{c.on('open',()=>{conns.add(c);res()});peer.on('error',e=>rej(new Error(e.type==='peer-unavailable'?'Partita non trovata: controlla il codice':'Errore di rete ('+e.type+')')));setTimeout(()=>rej(new Error('Non riesco a collegarmi all’host')),12000)})}
  return t}
+const SRV={id:'arena',nm:'Arena principale'};
+try{const h=new URLSearchParams(location.hash.slice(1)),r=(h.get('r')||'').toLowerCase().replace(/[^a-z0-9]/g,'').slice(0,8);if(r&&r!=='arena'){SRV.id=r;SRV.nm=String(h.get('nm')||'Stanza').slice(0,24)}}catch(e){}
+function sbClient(){if(!window.supabase||!window.ZR_SB_URL)return null;if(!window.__zrsb)window.__zrsb=window.supabase.createClient(window.ZR_SB_URL,window.ZR_SB_KEY,{realtime:{params:{eventsPerSecond:30}}});return window.__zrsb}
 async function sbTransport(){if(!window.supabase)throw new Error('Libreria Supabase non caricata');const id='1'+Math.random().toString(36).slice(2,10);
- const sb=window.supabase.createClient(window.ZR_SB_URL,window.ZR_SB_KEY,{realtime:{params:{eventsPerSecond:30}}});const ch=sb.channel('zr3-arena',{config:{broadcast:{self:false,ack:false}}});let cb=()=>{};
+ const sb=sbClient();const ch=sb.channel(SRV.id==='arena'?'zr3-arena':'zr3-r-'+SRV.id,{config:{broadcast:{self:false,ack:false}}});let cb=()=>{};
  ch.on('broadcast',{event:'m'},({payload})=>cb(payload));
  await new Promise((res,rej)=>{ch.subscribe(s=>{if(s==='SUBSCRIBED')res();else if(s==='CHANNEL_ERROR'||s==='TIMED_OUT')rej(new Error('Server non raggiungibile'))});setTimeout(()=>rej(new Error('Server non raggiungibile')),12000)});
  return{myId:id,minGap:100,send(o){ch.send({type:'broadcast',event:'m',payload:o})},onMsg(f){cb=f}}}
@@ -1247,6 +1258,46 @@ else if(NET==='p2p'){$('bOn').style.display='none';$('p2p').style.display='block
   try{const t=await p2pTransport(code,host);p2p.code=code;p2p.host=host;attachRoom(makeRoom(t));$('bStart').style.display=host?'block':'none';$('lobby').textContent=host?`Codice partita: ${code} · dillo ai tuoi amici`:'Collegato! Aspetta che l’host avvii la partita'}
   catch(e){netErr=e.message;$('bHost').disabled=$('bJoin').disabled=false;$('lobby').textContent=''}updMenu()};
  $('bHost').onclick=()=>go(true);$('bJoin').onclick=()=>go(false);$('bStart').onclick=p2pHostStart;updMenu()}
+
+/* ---------- LOBBY PUBBLICA (Supabase Realtime presence sul canale zr3-lobby) ---------- */
+const lobbyRows=new Map(),setT=(e,t)=>{if(e.textContent!==t)e.textContent=t};let lobbyCh=null,lobbyAd=null,lobbyAdS='null',lobbyList=[],lobbyOk=false;
+const MML={fp:'Prima persona',tp:'Terza persona',mix:'Misto'},SQL={1:'da solo',2:'squadre da 2',3:'squadre da 3'};
+function lobbyClean(a){if(!a||typeof a!=='object')return null;const t=a.t==='p'?'p':a.t==='s'?'s':null;if(!t)return null;const id=String(a.id||'');
+ if(t==='s'&&!/^[a-z0-9]{1,8}$/.test(id))return null;if(t==='p'&&!/^\d{4,6}$/.test(id))return null;
+ return{t,id,h:String(a.h||'').slice(0,24)||(t==='s'?'Stanza':'Partita'),n:clamp(+a.n||0,0,99),mm:MML[a.mm]?a.mm:'',sq:SQL[a.sq]?+a.sq:0,st:a.st?1:0}}
+function lobbyStart(){if(lobbyCh||NET==='claude')return;const sb=sbClient();if(!sb)return;$('pub').style.display='block';$('bNewRoom').style.display=NET==='server'?'block':'none';
+ lobbyCh=sb.channel('zr3-lobby',{config:{presence:{key:'k'+Math.random().toString(36).slice(2,10)}}});
+ lobbyCh.on('presence',{event:'sync'},()=>{const st=lobbyCh.presenceState(),m=new Map();for(const k in st)for(const raw of st[k]||[]){const a=lobbyClean(raw);if(!a)continue;const key=a.t+a.id,o=m.get(key);if(!o||a.n>o.n)m.set(key,a)}lobbyList=[...m.values()];lobbyRender()});
+ lobbyCh.subscribe(s=>{if(s==='SUBSCRIBED'){lobbyOk=true;if(lobbyAd)lobbyCh.track(lobbyAd);lobbyRender()}else if(s==='CHANNEL_ERROR'||s==='TIMED_OUT'){lobbyOk=false;lobbyRender()}});
+ setInterval(lobbyTick,2000);lobbyRender()}
+function lobbyAdvertise(ad){const s=JSON.stringify(ad);if(s===lobbyAdS)return;lobbyAdS=s;lobbyAd=ad;if(!lobbyCh||!lobbyOk)return;if(ad)lobbyCh.track(ad);else lobbyCh.untrack()}
+function lobbyTick(){let ad=null;
+ if(NET==='server'&&room){const ps=room.peers(),ids=ps.map(p=>p.peer).sort();if(ids[0]===myPeer)ad={t:'s',id:SRV.id,h:SRV.nm,n:ps.length}}
+ else if(NET==='p2p'&&room&&p2p.host&&$('pubchk').checked){const live=p2p.go>0&&Date.now()-p2p.go<ROUND&&!me.ended;ad={t:'p',id:p2p.code,h:(myName||'Recluta')+'',n:room.peers().length,mm:matchMode,sq:squad,st:live?1:0}}
+ lobbyAdvertise(ad);if(mode==='menu')lobbyRender()}
+function lobbyRender(){const box=$('publist');if(!box||!lobbyCh)return;const L=lobbyList.slice();
+ if(!L.some(a=>a.t==='s'&&a.id==='arena'))L.push({t:'s',id:'arena',h:'Arena principale',n:0});
+ if(NET==='server'&&SRV.id!=='arena'&&!L.some(a=>a.t==='s'&&a.id===SRV.id))L.push({t:'s',id:SRV.id,h:SRV.nm,n:room?room.peers().length:1});
+ const mine=a=>(NET==='server'&&a.t==='s'&&a.id===SRV.id)||(NET==='p2p'&&a.t==='p'&&a.id===p2p.code);
+ L.sort((a,b)=>mine(b)-mine(a)||(a.id==='arena'&&a.t==='s'?-1:b.id==='arena'&&b.t==='s'?1:0)||b.n-a.n);
+ const np=L.reduce((s,a)=>s+a.n,0);$('pubn').textContent=lobbyOk?`${L.length} ${L.length===1?'partita':'partite'} · ${np} ${np===1?'giocatore':'giocatori'}`:'collegamento…';
+ const c=Date.now()%ROUND,keep=new Set();
+ const emp=box.querySelector('.pempty');if(emp)emp.remove();
+ L.forEach((a,ix)=>{const key=a.t+a.id;keep.add(key);let r=lobbyRows.get(key);
+  if(!r){r=document.createElement('div');r.className='pr';r.setAttribute('role','listitem');const t=document.createElement('div');t.className='pt';const b=document.createElement('b');const tg=document.createElement('span');b.appendChild(tg);b.appendChild(document.createTextNode(''));const sm=document.createElement('small');t.appendChild(b);t.appendChild(sm);const bt=document.createElement('button');bt.type='button';r.appendChild(t);r.appendChild(bt);r._={tg,tx:b.lastChild,sm,bt};lobbyRows.set(key,r)}
+  const u=r._,m=mine(a);r.className='pr'+(m?' me':'');u.tg.className='tg'+(a.t==='p'?' p':'');setT(u.tg,a.t==='p'?'AMICI':'ONLINE');
+  const tx=a.t==='p'?'Partita di '+a.h:a.h;if(u.tx.data!==tx)u.tx.data=tx;
+  setT(u.sm,a.t==='s'?`${a.n} ${a.n===1?'giocatore':'giocatori'} · ${c<LOBBY?'si parte tra '+Math.ceil((LOBBY-c)/1000)+' s':'prossimo round tra '+Math.ceil((ROUND-c)/1000)+' s'}`
+   :`${a.n}/${MAXP} · ${[MML[a.mm],SQL[a.sq]].filter(Boolean).join(' · ')} · ${a.st?'in corso':'in attesa'}`);
+  if(m){setT(u.bt,NET==='server'?'Gioca':'Sei qui');u.bt.disabled=NET!=='server'||$('bOn').disabled}else{setT(u.bt,'Entra');u.bt.disabled=(a.t==='p'&&a.n>=MAXP)||(NET==='p2p'&&a.t==='p'&&!!room)}
+  u.bt.onclick=()=>lobbyJoin(a,m);if(box.children[ix]!==r)box.insertBefore(r,box.children[ix]||null)});
+ for(const [k,r] of lobbyRows)if(!keep.has(k)){r.remove();lobbyRows.delete(k)}}
+function lobbyJoin(a,isMine){readNick();
+ if(a.t==='s'){if(isMine&&NET==='server'){$('bOn').click();return}const h='r='+a.id+(a.id==='arena'?'':'&nm='+encodeURIComponent(a.h));if(NET==='server'){location.hash=h;location.reload()}else location.href='online.html#'+h;return}
+ if(NET==='p2p'){if(room)return;$('jcode').value=a.id;$('bJoin').click()}else location.href='p2p.html#j='+a.id}
+$('bNewRoom').onclick=()=>{readNick();const id=Math.random().toString(36).slice(2,7).replace(/[^a-z0-9]/g,'x');location.hash='r='+id+'&nm='+encodeURIComponent('Stanza di '+myName);location.reload()};
+lobbyStart();
+if(NET==='p2p'){try{const j=(new URLSearchParams(location.hash.slice(1)).get('j')||'').replace(/\D/g,'').slice(0,6);if(j.length>=4){$('jcode').value=j;history.replaceState(null,'',location.pathname);setTimeout(()=>$('bJoin').click(),300)}}catch(e){}}
 requestAnimationFrame(frame);
 }
 </script>
