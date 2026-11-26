@@ -1,6 +1,6 @@
 # Blocky Zoo Royale 🐾
 
-Battle royale in prima persona tra animali a cubo, nel browser.
+Battle royale in prima persona tra animali a cubo, nel browser: 40 giocatori (i posti liberi li riempiono i bot) su un'isola con 3 villaggi, un paese e 5 fabbriche abbandonate.
 Lanciati dall'aereo col paracadute e trova armi e bottino. Esplora paesi, boschi, deserto e fabbriche abbandonate, e stai lontano dai laghetti con i coccodrilli. Resta l'ultimo in piedi.
 
 **Gioca:** apri `index.html` (la pagina d'ingresso con la lobby) oppure `online.html`.

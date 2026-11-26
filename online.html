@@ -215,7 +215,7 @@ body.tc.ingame #prompt:not(.full){display:none!important}
 {
 const $=id=>document.getElementById(id);
 const cv=$('cv'),mm=$('mm'),mx=mm.getContext('2d');
-const WORLD=8400,WSC=WORLD/7000,WAF=WSC*WSC,ROUND=360000,LOBBY=12000,PR=22,MAXP=20,G=200,GN=WORLD/G,PLANE=48,PALT=74,H3=3.4;
+const WORLD=12000,WSC=WORLD/7000,WAF=WSC*WSC,ROUND=450000,LOBBY=12000,PR=22,MAXP=40,G=200,GN=WORLD/G,PLANE=60,PALT=74,H3=3.4;
 const WEAP={
  pugni:{n:'Pugni',s:'PUG',dmg:24,rate:2.2,mag:0,rel:0,spd:900,range:50,melee:1},
  pistola:{n:'Pistola',s:'PIS',dmg:15,rate:4,mag:15,rel:1.2,spd:1500,range:750,spread:.05,col:'#ffd36a',len:20},
@@ -245,12 +245,12 @@ function itemQ(k){return WEAP[k]?WEAP[k].mag:k==='ammo'?30:k==='bende'?2:1}
 /* ---------- MAPPA ---------- */
 let world=null;
 const HC=[['#f0dfc0','#e0574a'],['#cfe3f0','#3d6fb3'],['#f5d0c8','#c4453a'],['#d8ecd0','#4f8f45'],['#f3e6a8','#d98a2a'],['#e6d8f0','#7a5a9a']],HCD=[['#e9cf9f','#b5653a'],['#f0dcb4','#a4572f']];
-const TOWN={x:WORLD*.385,y:WORLD*.385,h:860},HAM={x:WORLD*.22,y:WORLD*.6,h:560},HN=210,HSTEP=WORLD/HN;
+const TOWN={x:WORLD*.385,y:WORLD*.385,h:860},HAM={x:WORLD*.22,y:WORLD*.6,h:560},HAMS=[HAM,{x:WORLD*.7,y:WORLD*.3,h:560},{x:WORLD*.64,y:WORLD*.74,h:560}],HN=300,HSTEP=WORLD/HN;
 let ISL=[0,1,2,3];
 function landR(x,y){const a=Math.atan2(y-WORLD/2,x-WORLD/2);return WORLD*.465*(1+.055*Math.sin(3*a+ISL[0])+.04*Math.sin(5*a+ISL[1])+.025*Math.sin(9*a+ISL[2])+.015*Math.sin(14*a+ISL[3]))}
 function shoreD(x,y){return landR(x,y)-Math.hypot(x-WORLD/2,y-WORLD/2)}
 function onLand(x,y,m=0){return shoreD(x,y)>m}
-function biome(x,y){if(Math.abs(x-TOWN.x)<TOWN.h&&Math.abs(y-TOWN.y)<TOWN.h)return'town';if(Math.abs(x-HAM.x)<HAM.h&&Math.abs(y-HAM.y)<HAM.h)return'town';
+function biome(x,y){if(Math.abs(x-TOWN.x)<TOWN.h&&Math.abs(y-TOWN.y)<TOWN.h)return'town';for(const H of HAMS)if(Math.abs(x-H.x)<H.h&&Math.abs(y-H.y)<H.h)return'town';
  if(y>WORLD*.68+Math.sin(x*.0012)*WORLD*.04)return'desert';if(x>WORLD*.58+Math.sin(y*.0015)*WORLD*.04)return'forest';return'meadow'}
 const sstep=(a,b,v)=>{const t=clamp((v-a)/(b-a),0,1);return t*t*(3-2*t)};
 function ground(x,y){if(!world)return 0;const hm=world.hm,fx=clamp(x/HSTEP,0,HN-1e-6),fy=clamp(y/HSTEP,0,HN-1e-6),i=fx|0,j=fy|0,u=fx-i,v=fy-j,N=HN+1;
@@ -290,14 +290,13 @@ function genMap(seed){
   if(a===1&&b===1){const fx=lx+L/2,fy=ly+L/2;add({t:'fount',x:fx,y:fy,r:70});for(const q of[[-150,0],[150,0],[0,-150],[0,150]])add({t:'furn',f:'panca',x:fx+q[0]-(q[1]?40:12),y:fy+q[1]-(q[1]?12:40),w:q[1]?80:24,h:q[1]?24:80});continue}
   const two=(k2++)%2===0,w=two?400:340+R()*40|0,h=two?320:270+R()*30|0;house(lx+(L-w)/2|0,ly+(L-h)/2|0,w,h,two,HC[R()*HC.length|0])}
  // villaggio: incrocio con 4 case
- roads.push({x:HAM.x-45,y:HAM.y-HAM.h,w:90,h:HAM.h*2});roads.push({x:HAM.x-HAM.h,y:HAM.y-45,w:HAM.h*2,h:90});
- for(const [qx,qy] of [[-1,-1],[1,-1],[-1,1],[1,1]]){const two=qx===qy,w=two?400:350,h=two?320:280,cx=HAM.x+qx*(HAM.h/2+20),cy=HAM.y+qy*(HAM.h/2+20);house(cx-w/2|0,cy-h/2|0,w,h,two,HC[R()*HC.length|0])}
+ for(const HAM of HAMS){roads.push({x:HAM.x-45,y:HAM.y-HAM.h,w:90,h:HAM.h*2});roads.push({x:HAM.x-HAM.h,y:HAM.y-45,w:HAM.h*2,h:90});  for(const [qx,qy] of [[-1,-1],[1,-1],[-1,1],[1,1]]){const two=qx===qy,w=two?400:350,h=two?320:280,cx=HAM.x+qx*(HAM.h/2+20),cy=HAM.y+qy*(HAM.h/2+20);house(cx-w/2|0,cy-h/2|0,w,h,two,HC[R()*HC.length|0])}}
  // case di campagna e del deserto
  for(let n=0,t=0;n<Math.round(11*WAF)&&t<6000;t++){const x=200+R()*(WORLD-700),y=200+R()*(WORLD-700),bi=biome(x,y),bi2=biome(x+420,y+340);if(bi==='town'||bi!==bi2)continue;
   const des=bi==='desert';if(des&&n<6)continue;const two=!des&&R()<.5,w=two?400:330+R()*40|0,h=two?320:270;if(!onLand(x,y,320)||!onLand(x+w,y,320)||!onLand(x,y+h,320)||!onLand(x+w,y+h,320))continue;
   if(houses.some(q=>x<q.x+q.w+260&&x+w+260>q.x&&y<q.y+q.h+260&&y+h+260>q.y))continue;house(x|0,y|0,w,h,two,des?HCD[R()*2|0]:HC[R()*HC.length|0]);n++}
  // fabbriche abbandonate: capannone in rovina con muri spezzati, pilastri, ufficio, macchinari, ciminiera e container
- for(let n=0,t=0;n<3&&t<9000;t++){const w=720+R()*180|0,h=500+R()*120|0,x=300+R()*(WORLD-600-w)|0,y=300+R()*(WORLD-600-h)|0,bi=biome(x+w/2,y+h/2);if(bi==='town'||bi==='forest')continue;
+ for(let n=0,t=0;n<5&&t<14000;t++){const w=720+R()*180|0,h=500+R()*120|0,x=300+R()*(WORLD-600-w)|0,y=300+R()*(WORLD-600-h)|0,bi=biome(x+w/2,y+h/2);if(bi==='town'||bi==='forest')continue;
   if(!onLand(x-150,y-150,300)||!onLand(x+w+150,y-150,300)||!onLand(x-150,y+h+150,300)||!onLand(x+w+150,y+h+150,300))continue;
   if(houses.some(q=>x<q.x+q.w+300&&x+w+300>q.x&&y<q.y+q.h+300&&y+h+300>q.y))continue;if(facs.some(q=>Math.hypot(q.x-x,q.y-y)<1700))continue;
   if(roads.some(r=>x<r.x+r.w+160&&x+w+160>r.x&&y<r.y+r.h+160&&y+h+160>r.y))continue;
@@ -324,7 +323,7 @@ function genMap(seed){
  const N=HN+1,hm=new Float32Array(N*N),TR=rng(seed^0x7e44),terms=[];for(let i=0;i<5;i++)terms.push({fx:(.0012+TR()*.0022)*(TR()<.5?1:-1),fy:.0012+TR()*.0022,px:TR()*6.28,py:TR()*6.28,a:1/(1+i*.6)});
  for(let j=0;j<N;j++)for(let i=0;i<N;i++){const x=i*HSTEP,y=j*HSTEP;let v=0;for(const t of terms)v+=Math.sin(x*t.fx+t.px)*Math.sin(y*t.fy+t.py)*t.a;
   const bi=biome(x,y);let amp=bi==='desert'?2.4:bi==='forest'?3.2:2.6;if(bi==='desert')v=v*.6+Math.sin(x*.004+y*.0015)*.5;
-  const sd=shoreD(x,y);let m=sstep(150,600,sd);const tdx=Math.max(0,Math.abs(x-TOWN.x)-TOWN.h),tdy=Math.max(0,Math.abs(y-TOWN.y)-TOWN.h);m*=sstep(0,320,Math.hypot(tdx,tdy));const hdx=Math.max(0,Math.abs(x-HAM.x)-HAM.h),hdy=Math.max(0,Math.abs(y-HAM.y)-HAM.h);m*=sstep(0,280,Math.hypot(hdx,hdy));
+  const sd=shoreD(x,y);let m=sstep(150,600,sd);const tdx=Math.max(0,Math.abs(x-TOWN.x)-TOWN.h),tdy=Math.max(0,Math.abs(y-TOWN.y)-TOWN.h);m*=sstep(0,320,Math.hypot(tdx,tdy));for(const HAM of HAMS){const hdx=Math.max(0,Math.abs(x-HAM.x)-HAM.h),hdy=Math.max(0,Math.abs(y-HAM.y)-HAM.h);m*=sstep(0,280,Math.hypot(hdx,hdy))}
   for(const h of houses){const dx=Math.max(0,h.x-x,x-(h.x+h.w)),dy=Math.max(0,h.y-y,y-(h.y+h.h));m*=sstep(60,300,Math.hypot(dx,dy))}
   for(const h of facs){const dx=Math.max(0,h.x-280-x,x-(h.x+h.w+280)),dy=Math.max(0,h.y-280-y,y-(h.y+h.h+280));m*=sstep(40,360,Math.hypot(dx,dy))}
   let hv=v*amp*m;if(hv<0)hv*=.42;hm[j*N+i]=hv+(sd<140?clamp((sd-140)/220,-1,0)*2.8:0)}
@@ -338,7 +337,7 @@ function genMap(seed){
  place(Math.round(210*WAF),'desert',(x,y)=>({t:'cactus',x,y,r:16+R()*6,arms:R()*3|0}));
  for(const [n,bio] of [[95,'meadow'],[70,'forest'],[75,'desert'],[35,'town']])place(bio==='town'?n:Math.round(n*WAF),bio,(x,y)=>({t:'crate',x:x-28,y:y-28,w:56,h:56,hp:70,cx:x,cy:y,r:40}));
  // decorazioni senza collisione
- for(let i=0;i<Math.round(8200*WAF);i++){const x=R()*WORLD,y=R()*WORLD;if(!onLand(x,y,220)||!dry(x,y,20)||nearHouse(x,y,30)||onRoad(x,y,8))continue;const bi=biome(x,y),q=R();
+ for(let i=0;i<Math.round(8200*Math.min(WAF,2.3));i++){const x=R()*WORLD,y=R()*WORLD;if(!onLand(x,y,220)||!dry(x,y,20)||nearHouse(x,y,30)||onRoad(x,y,8))continue;const bi=biome(x,y),q=R();
   let t=null;if(bi==='meadow')t=q<.12?'bush':q<.5?'flower':'tuft';else if(bi==='forest')t=q<.14?'bush':q<.32?'fern':q<.4?'mush':q<.43?'stump':q<.45?'log':'tuft';else if(bi==='town')t=q<.25?'flower':'tuft';else t=q<.15?'dry':q<.2?'skull':'drytuft';
   if(t==='skull'&&R()<.8)continue;deco.push({t,x,y,s:.7+R()*.7,r:R()*6.28,c:R()*4|0})}
  for(const h of houses){const bh=biome(h.x+h.w/2,h.y+h.h/2);if(bh==='town'||bh==='desert')continue;const m=90,x0=h.x-m,y0=h.y-m,x1=h.x+h.w+m,y1=h.y+h.h+m;
@@ -355,7 +354,7 @@ function genMap(seed){
   for(let i=0,t=0;i<3&&t<200;t++){const x=F.x+70+R()*(F.w-140),y=F.y+70+R()*(F.h-140);if(F.parts.some(o=>x>o.x-50&&x<o.x+o.w+50&&y>o.y-50&&y<o.y+o.h+50))continue;add({t:'crate',x:x-28,y:y-28,w:56,h:56,hp:70,cx:x,cy:y,r:40});i++}}
  items.forEach(it=>it.q=itemQ(it.k));
  const ZR=rng(seed^0x9e3779);const fr=[{t:0,x:WORLD/2,y:WORLD/2,r:WORLD*.78}];let Tt=0,c=fr[0];
- for(const [wait,shr0,nr0] of [[56,38,2900],[30,30,1750],[24,22,1000],[18,16,470],[10,12,0]]){const shr=Math.round(shr0*WSC),nr=nr0*WSC;
+ for(const [wait0,shr0,nr0] of [[56,38,2900],[30,30,1750],[24,22,1000],[18,16,470],[10,12,0]]){const wait=Math.round(wait0*1.2),shr=Math.round(shr0*WSC),nr=nr0*WSC;
   Tt+=wait;fr.push({t:Tt,x:c.x,y:c.y,r:c.r});const off=Math.max(0,c.r-nr)*.75,a=ZR()*6.283,d=ZR()*off;
   const nx=clamp(c.x+Math.cos(a)*d,nr+120,WORLD-nr-120),ny=clamp(c.y+Math.sin(a)*d,nr+120,WORLD-nr-120);
   Tt+=shr;c={t:Tt,x:nr>0?nx:c.x,y:nr>0?ny:c.y,r:nr};fr.push(c)}
@@ -568,9 +567,11 @@ function makeBots(c){const n=Math.max(0,MAXP-1-[...remote.values()].filter(r=>r.
   bots.push({id,x:p.x,y:p.y,a:p.a,hp:100,arm:0,he:0,bg:0,w:'pugni',w2:null,mag:0,res:0,bende:0,kit:0,rel:0,cd:0,al:1,dby:null,think:0,gx:p.x,gy:p.y,str:R()<.5?1:-1,strT:0,tgt:null,seenT:0,aimT:0,burst:0,
    skill:.6+R()*.6,lx:p.x,ly:p.y,stuck:0,st:1,alt:PALT,jf:world.plane.fa+R()*(world.plane.fb-world.plane.fa)*.95,dr:R()*6.28,lv:0,pose:0,jz:0,vz:0,state:'loot',goalItem:null,healT:0,tm:squad===1?id:i<mates?'P':'b'+Math.floor((i-mates)/squad)})}
  if(mates)for(const b of bots)if(b.tm==='P'){b.jf=(world.plane.fa+world.plane.fb)/2;b.skill=Math.max(b.skill,.95)}
- botsRound=c.idx}
+ landLateBots(c);botsRound=c.idx}
+/* se l'aereo è già passato (host entrato a partita iniziata), i bot rimasti a bordo vengono messi direttamente a terra */
+function landLateBots(c){const ts=(c.t-LOBBY)/1000;if(ts<PLANE*.8)return;for(const b of bots){if(b.st!==1&&!(b.st===2&&shoreD(b.x,b.y)<0))continue;const p=spawnPoint(b.id+'|'+c.idx);Object.assign(b,{x:p.x,y:p.y,gx:p.x,gy:p.y,lx:p.x,ly:p.y,st:0,alt:0})}}
 function adoptBots(c){bots=[...rbots.values()].map(b=>({id:b.id,x:b.x,y:b.y,a:b.a,hp:b.hp,arm:b.arm,he:b.he||0,bg:0,w:b.w||'pistola',w2:null,mag:WEAP[b.w]?WEAP[b.w].mag:15,res:30,bende:1,kit:0,rel:0,cd:.5,al:b.al,dby:b.dby,think:0,gx:b.x,gy:b.y,str:1,strT:0,tgt:null,seenT:0,aimT:0,burst:0,
-  skill:.8,lx:b.x,ly:b.y,stuck:0,st:b.st||0,alt:b.alt||0,jf:0,dr:Math.random()*6.28,lv:0,pose:0,jz:0,vz:0,state:'loot',goalItem:null,healT:0,tm:b.tm||b.id}));rbots=new Map();botsRound=c.idx}
+  skill:.8,lx:b.x,ly:b.y,stuck:0,st:b.st||0,alt:b.alt||0,jf:0,dr:Math.random()*6.28,lv:0,pose:0,jz:0,vz:0,state:'loot',goalItem:null,healT:0,tm:b.tm||b.id}));rbots=new Map();landLateBots(c);botsRound=c.idx}
 const eid=e=>e===me?myId():e.id;
 function targetsFor(bt){const t=[];const ok=e=>!e.st&&!(e.lv||0)&&!stairOf(e.x,e.y);if(me.alive&&me.playing&&ok(me)&&!friend(bt.tm,myTeam()))t.push(me);for(const r of remote.values())if(r.al&&r.pl&&ok(r)&&!friend(bt.tm,r.tm))t.push(r);for(const o of bots)if(o.al&&o!==bt&&ok(o)&&!o.st&&!friend(bt.tm,o.tm))t.push(o);return t}
 function blockedAt(x,y){if(ground(x,y)<-.3||!onLand(x,y,60))return true;for(const o of cellAt(x,y)){if(o.dead||!(o.lv===0||o.lv===2))continue;if(o.w){if(x>o.x-PR&&x<o.x+o.w+PR&&y>o.y-PR&&y<o.y+o.h+PR)return true}else if(Math.hypot(x-o.x,y-o.y)<o.r+PR)return true}return false}
@@ -1187,7 +1188,7 @@ function nameSprite(t,mate){const tx=canvasTex(256,64,(g)=>{g.fillStyle=mate?'rg
 const ents=new Map();
 function syncEnt(id,e,ch,name,dt,o,vis=true){const mate=squad>1&&id!=='me'&&friend(e.tm,myTeam());const key=ch+'|'+(o||[]).join(',')+'|'+(e.he||0)+'|'+(e.bg||0)+'|'+mate;let en=ents.get(id);
  if(!en||en.key!==key){if(en)scene.remove(en.g);const g=charMesh(ch,o,e.he||0,e.bg||0);if(name){const sp=nameSprite(name,mate);g.add(sp);g.userData.label=sp}en={g,key,ph:0};scene.add(g);ents.set(id,en)}
- en.seen=true;const g=en.g;g.visible=vis&&e.st!==1;g.position.set(e.x*S,elev(e),e.y*S);g.rotation.y=-(e.a||0);
+ en.seen=true;const g=en.g;if(id!=='me'){const dx=e.x*S-camera.position.x,dz=e.y*S-camera.position.z;if(dx*dx+dz*dz>232*232){g.visible=false;return}}g.visible=vis&&e.st!==1;g.position.set(e.x*S,elev(e),e.y*S);g.rotation.y=-(e.a||0);
  const body=g.userData.body,pose=e.pose||0;
  if(e.moving){en.ph+=dt*12*POSE_SPD[pose]}const b=Math.abs(Math.sin(en.ph))*.12;
  body.scale.set(pose===2?1.15:1,pose===1?.78:pose===2?.5:1,1);body.position.y=(e.moving&&!e.st?b:0);
